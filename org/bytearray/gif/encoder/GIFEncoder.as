@@ -281,6 +281,27 @@ package org.bytearray.gif.encoder
 		}
 
 		/**
+		 * @return True if encoder has started
+		 */
+		public function hasStarted():Boolean
+		{
+			return started;
+		}
+
+		/**
+		 * Flushes the OutputStream
+		 * @return byte data of the output stream so far
+		 */
+		public function flushStream():ByteArray
+		{
+			var flushed:ByteArray=new ByteArray();
+			flushed.writeBytes(out);
+
+			out.length=0;
+			return flushed;
+		}
+
+		/**
 		* Analyzes image colors and creates color map.
 		*/
 		
