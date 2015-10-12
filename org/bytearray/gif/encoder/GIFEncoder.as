@@ -161,6 +161,53 @@ package org.bytearray.gif.encoder
 			return ok;
 			
 		}
+
+		/**
+		 * Sets the global color palette from an input image
+		 * Useful for cases where you have GCP enabled but the first frame does not represent the entire range of color that will be used in later frames
+		 * @param im BitmapData object to sample the GCP from
+		 */
+		public function sampleGCP(im:BitmapData):Boolean
+		{
+			if(!started || out == null)
+			{
+				throw new Error ("Please call start method before calling addFrame");
+			}
+
+			if(!useGCP)
+			{
+				throw new Error ("Must enable global color palette to call createGCP");
+			}
+
+			if(!firstFrame)
+			{
+				throw new Error("createGCP must be called before first frame is added");
+			}
+
+			var ok:Boolean = true;
+
+			try {
+				image = new Bitmap(im);
+				if (!sizeSet) setSize(image.width, image.height);
+
+				getImagePixels();
+				analyzePixels();
+				writeLSD(); // logical screen descriptor
+				writePalette(); // global color table
+				if (repeat >= 0)
+				{
+					// use NS app extension to indicate reps
+					writeNetscapeExt();
+				}
+
+				firstFrame = false;
+
+			} catch (e:Error) {
+				ok = false;
+			}
+
+			return ok;
+		}
 		
 		/**
 		* Adds final trailer to the GIF stream, if you don't call the finish method
